@@ -132,6 +132,13 @@ def generate_answer(prompt, model, tokenizer):
     answer = tokenizer.decode(output[0], skip_special_tokens=True)
     return answer
 
+---
+
+from transformers.tokenization_openai import OpenAIGPTTokenizer
+from transformers.modeling_tf_openai import TFOpenAIGPTLMHeadModel
+model = TFOpenAIGPTLMHeadModel.from_pretrained("openai-gpt")
+tokenizer = OpenAIGPTTokenizer.from_pretrained("openai-gpt")
+
 # Example usage
 prompt = "Once upon a time"
 generated_answer = generate_answer(prompt, model, tokenizer)
