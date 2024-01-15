@@ -17,3 +17,8 @@ customer_calls = [int(text) for text, label in entities if label == "CARDINAL"]
 
 # Print the extracted information
 print("Number of customer calls:", customer_calls)
+
+---
+# With external URL
+pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0-py3-none-any.whl
+pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
