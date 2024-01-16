@@ -1,15 +1,32 @@
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+model_path = r'C:\Users\Zubale\Desktop\model'
+
+# Load the model and tokenizer from the saved files
+model = AutoModelForSequenceClassification.from_pretrained(model_path)
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+
+
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from transformers import pipeline
 
-# Load a zero-shot classification pipeline
-classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+# Assuming you've already loaded model and tokenizer
+# model = AutoModelForSequenceClassification.from_pretrained('path/to/model')
+# tokenizer = AutoTokenizer.from_pretrained('path/to/tokenizer')
+
+# Create the zero-shot classification pipeline
+# Using the manually loaded model and tokenizer
+classifier = pipeline("zero-shot-classification", model=model, tokenizer=tokenizer)
 
 # Sample text
-text = "Called customer at 22 and 23 o'clock, but the call failed."
+text = "The new coffee shop on the corner is fantastic. Great ambiance, friendly staff, and the coffee is top-notch."
 
 # Candidate labels
-labels = ["call made", "successful call", "unsuccessful call"]
+labels = ["drink", "call", "sad", "happy"]
 
 # Perform classification
 result = classifier(text, labels)
 
-print(result)
+# Display the results
+for label, score in zip(result["labels"], result["scores"]):
+    print(f"{label}: {score:.4f}")
