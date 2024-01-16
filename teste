@@ -1,42 +1,17 @@
-import requests
+import re
 
-# Replace with your Cognitive Services Translator API endpoint and subscription key
-endpoint = "https://api.cognitive.microsofttranslator.com/"
-subscription_key = "d8607f98d0c7477f91f0c30e42329152"
-region = "eastus"
+# Input text
+text = "This is a sample text. Find the word after 'sample' in this text."
 
-# Text to be translated
-text_to_translate = "Hello, how are you?"
+# Define the specific occurrence to search for
+specific_occurrence = "sample"
 
-# Language code for the target language (e.g., "en" for English)
-target_language = "pt-br"  # Replace with your target language code
+# Use a regular expression to find the word after the specific occurrence
+pattern = rf"{re.escape(specific_occurrence)}\s+(\w+)"
+match = re.search(pattern, text)
 
-# Construct the API request URL
-api_url = f"{endpoint}/translate?api-version=3.0&to={target_language}"
-
-# Define the request headers
-headers = {
-    "Ocp-Apim-Subscription-Key": subscription_key,
-    "Ocp-Apim-Subscription-Region": region,
-    "Content-Type": "application/json",
-}
-
-# Define the request body
-body = [
-    {"text": text_to_translate}
-]
-
-# Make the POST request to the Translator Text API
-response = requests.post(api_url, headers=headers, json=body)
-
-# Check if the request was successful
-if response.status_code == 200:
-    # Parse and print the translated text
-    translation = response.json()
-    translated_text = translation[0]["translations"][0]["text"]
-    print(f"Original text: {text_to_translate}")
-    print(f"Translated text: {translated_text}")
+if match:
+    word_after_occurrence = match.group(1)
+    print(f"The word after '{specific_occurrence}' is: {word_after_occurrence}")
 else:
-    # Print an error message if the request failed
-    print(f"Translation failed with status code: {response.status_code}")
-    print(response.text)
+    print(f"'{specific_occurrence}' not found in the text or no word found after it.")
