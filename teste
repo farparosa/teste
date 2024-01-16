@@ -1,32 +1,23 @@
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from spellchecker import SpellChecker
 
-model_path = r'C:\Users\Zubale\Desktop\model'
+def correct_spelling_portuguese(text):
+    spell = SpellChecker(language='pt')
+    
+    corrected_text = []
+    for word in text.split():
+        corrected_word = spell.correction(word)
+        corrected_text.append(corrected_word)
 
-# Load the model and tokenizer from the saved files
-model = AutoModelForSequenceClassification.from_pretrained(model_path)
-tokenizer = AutoTokenizer.from_pretrained(model_path)
+    return ' '.join(corrected_text)
+
+# Example Portuguese text
+text = "Este é um txt com algun erros de digitação."
+
+# Correct spelling
+corrected_text = correct_spelling_portuguese(text)
+
+print(corrected_text)
 
 
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
-from transformers import pipeline
 
-# Assuming you've already loaded model and tokenizer
-# model = AutoModelForSequenceClassification.from_pretrained('path/to/model')
-# tokenizer = AutoTokenizer.from_pretrained('path/to/tokenizer')
-
-# Create the zero-shot classification pipeline
-# Using the manually loaded model and tokenizer
-classifier = pipeline("zero-shot-classification", model=model, tokenizer=tokenizer)
-
-# Sample text
-text = "The new coffee shop on the corner is fantastic. Great ambiance, friendly staff, and the coffee is top-notch."
-
-# Candidate labels
-labels = ["drink", "call", "sad", "happy"]
-
-# Perform classification
-result = classifier(text, labels)
-
-# Display the results
-for label, score in zip(result["labels"], result["scores"]):
-    print(f"{label}: {score:.4f}")
+pip install pyspellchecker
