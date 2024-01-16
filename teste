@@ -1,23 +1,10 @@
-from spellchecker import SpellChecker
+import re
 
-def correct_spelling_portuguese(text):
-    spell = SpellChecker(language='pt')
-    
-    corrected_text = []
-    for word in text.split():
-        corrected_word = spell.correction(word)
-        corrected_text.append(corrected_word)
+def clean_text(text):
+    # Remove special characters (keep letters, numbers, and spaces)
+    text = re.sub(r'[^A-Za-z0-9 ]+', '', text)
 
-    return ' '.join(corrected_text)
+    # Remove extra spaces
+    text = re.sub(r'\s+', ' ', text).strip()
 
-# Example Portuguese text
-text = "Este é um txt com algun erros de digitação."
-
-# Correct spelling
-corrected_text = correct_spelling_portuguese(text)
-
-print(corrected_text)
-
-
-
-pip install pyspellchecker
+    return text
