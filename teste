@@ -1,23 +1,42 @@
-from googletrans import Translator, LANGUAGES
+import requests
 
-def translate_text(text, src_lang='pt', dest_lang='en'):
-    # Initialize the translator
-    translator = Translator()
+# Replace with your Cognitive Services Translator API endpoint and subscription key
+endpoint = "https://api.cognitive.microsofttranslator.com/"
+subscription_key = "d8607f98d0c7477f91f0c30e42329152"
+region = "eastus"
 
-    # Translate the text
-    translation = translator.translate(text, src=src_lang, dest=dest_lang)
-    
-    return translation.text
+# Text to be translated
+text_to_translate = "Hello, how are you?"
 
-# Sample text in Portuguese
-portuguese_text = "Olá, como vai você?"
+# Language code for the target language (e.g., "en" for English)
+target_language = "pt-br"  # Replace with your target language code
 
-# Translate to English
-english_translation = translate_text(portuguese_text)
+# Construct the API request URL
+api_url = f"{endpoint}/translate?api-version=3.0&to={target_language}"
 
-print("Original (Portuguese):", portuguese_text)
-print("Translation (English):", english_translation)
+# Define the request headers
+headers = {
+    "Ocp-Apim-Subscription-Key": subscription_key,
+    "Ocp-Apim-Subscription-Region": region,
+    "Content-Type": "application/json",
+}
 
+# Define the request body
+body = [
+    {"text": text_to_translate}
+]
 
+# Make the POST request to the Translator Text API
+response = requests.post(api_url, headers=headers, json=body)
 
-pip install googletrans==4.0.0-rc1
+# Check if the request was successful
+if response.status_code == 200:
+    # Parse and print the translated text
+    translation = response.json()
+    translated_text = translation[0]["translations"][0]["text"]
+    print(f"Original text: {text_to_translate}")
+    print(f"Translated text: {translated_text}")
+else:
+    # Print an error message if the request failed
+    print(f"Translation failed with status code: {response.status_code}")
+    print(response.text)
