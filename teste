@@ -1,1 +1,23 @@
-text = re.sub(r'[^\w /:\(\)]+', '', text, flags=re.UNICODE)
+from googletrans import Translator, LANGUAGES
+
+def translate_text(text, src_lang='pt', dest_lang='en'):
+    # Initialize the translator
+    translator = Translator()
+
+    # Translate the text
+    translation = translator.translate(text, src=src_lang, dest=dest_lang)
+    
+    return translation.text
+
+# Sample text in Portuguese
+portuguese_text = "Olá, como vai você?"
+
+# Translate to English
+english_translation = translate_text(portuguese_text)
+
+print("Original (Portuguese):", portuguese_text)
+print("Translation (English):", english_translation)
+
+
+
+pip install googletrans==4.0.0-rc1
