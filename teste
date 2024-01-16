@@ -1,17 +1,1 @@
-import re
-
-# Input text
-text = "This is a sample text. Find the word after 'sample' in this text."
-
-# Define the specific occurrence to search for
-specific_occurrence = "sample"
-
-# Use a regular expression to find the word after the specific occurrence
-pattern = rf"{re.escape(specific_occurrence)}\s+(\w+)"
-match = re.search(pattern, text)
-
-if match:
-    word_after_occurrence = match.group(1)
-    print(f"The word after '{specific_occurrence}' is: {word_after_occurrence}")
-else:
-    print(f"'{specific_occurrence}' not found in the text or no word found after it.")
+pattern = rf".*{re.escape(specific_occurrence)}.*\s+(\w+)"
