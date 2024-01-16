@@ -1,9 +1,1 @@
-# Use a regular expression to find the word after the specific occurrence within any characters with spaces
-pattern = rf".*?\b{re.escape(specific_occurrence)}\b.*?\s+(\w+)"
-match = re.search(pattern, text)
-
-if match:
-    word_after_occurrence = match.group(1)
-    print(f"The word after '{specific_occurrence}' is: {word_after_occurrence}")
-else:
-    print(f"'{specific_occurrence}' not found in the text or no word found after it.")
+pattern = rf".*?\b{re.escape(specific_occurrence)}\b.*?\s+('?[^\s]+)"
