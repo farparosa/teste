@@ -1,1 +1,5 @@
-pattern = rf".*?\b{re.escape(specific_occurrence)}\b.*?\s+('?[^\s]+)"
+pattern = rf".*?{re.escape(specific_occurrence)}\s+('[^']+)"
+match = re.search(pattern, text)
+
+
+rf"{re.escape(specific_occurrence)}\s+(.*?):"
