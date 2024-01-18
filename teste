@@ -1,4 +1,1 @@
-rf"{re.escape(specific_occurrence)}\s+([^:\s]+)"
-
-
-rf"{re.escape(specific_occurrence)}\s+(.*?):"
+rf"{re.escape(specific_occurrence)}\s+(\w+(?:\s+\w+){0,9})"
