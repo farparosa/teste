@@ -1,1 +1,18 @@
-rf"{re.escape(specific_occurrence)}\s+(\w+(?:\s+\w+){0,9})"
+import re
+
+def extract_next_10_words(text, phrase="How are you doing?"):
+    # Create a regex pattern to find the phrase followed by up to 10 words
+    pattern = re.escape(phrase) + r'(\s+\w+){0,10}'
+    
+    # Find the first match
+    match = re.search(pattern, text)
+    
+    # Extract the next 10 words if a match is found
+    if match:
+        return match.group()[len(phrase):].strip()
+    else:
+        return ""
+
+# Example usage
+text = "Hello, How are you doing? I hope everything is fine. How are you doing? Just checking in."
+print(extract_next_10_words(text))
