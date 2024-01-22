@@ -1,17 +1,12 @@
-import re
-
-def extract_next_10_words(text, phrase="How are you doing?"):
-    # Create a regex pattern to find the phrase followed by up to 10 words
-    pattern = re.escape(phrase) + r'(\s+\w+){0,10}'
+    pattern = rf'{occurrence}((?:\S+|\s+){occurrence}(?:\S+|\s+)(?:(?=\s+)|$))'
     
-    # Find all matches using finditer
-    matches = re.finditer(pattern, text)
-
-    # Extract the next 10 words for each match and add them to a list
-    results = [match.group()[len(phrase):].strip() for match in matches]
-
+    # Find all matches in the text
+    matches = re.findall(pattern, text, re.DOTALL)
+    
+    # Extract and format the captured 10 words from each match
+    results = []
+    for match in matches:
+        match_text = match[0].strip()  # Remove leading/trailing spaces
+        results.append(match_text)
+    
     return results
-
-# Example usage
-text = "Hello, How are you doing? I hope everything is fine. How are you doing? Just checking in."
-print(extract_next_10_words(text))
