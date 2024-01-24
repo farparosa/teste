@@ -1,12 +1,1 @@
-    pattern = rf'{occurrence}((?:\S+|\s+){occurrence}(?:\S+|\s+)(?:(?=\s+)|$))'
-    
-    # Find all matches in the text
-    matches = re.findall(pattern, text, re.DOTALL)
-    
-    # Extract and format the captured 10 words from each match
-    results = []
-    for match in matches:
-        match_text = match[0].strip()  # Remove leading/trailing spaces
-        results.append(match_text)
-    
-    return results
+filtered_df = df[(df['column_name'] >= df['column_name'].quantile(0.25) - 1.5 * (df['column_name'].quantile(0.75) - df['column_name'].quantile(0.25))) & (df['column_name'] <= df['column_name'].quantile(0.75) + 1.5 * (df['column_name'].quantile(0.75) - df['column_name'].quantile(0.25)))]
