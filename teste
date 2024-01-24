@@ -1,24 +1,3 @@
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Generating sample data - replace this with your actual data
-data = np.random.normal(loc=0, scale=1, size=1000)
-
-# Creating the histogram
-plt.figure(figsize=(10, 6))
-n, bins, patches = plt.hist(data, bins=30, color='blue', edgecolor='black', alpha=0.7)
-
-# Calculate the percentage of data in each bin
-bin_centers = 0.5 * (bins[:-1] + bins[1:])
-percentages = (n / n.sum()) * 100
-
 # Annotate each bar with the percentage
-for percent, x in zip(percentages, bin_centers):
-    plt.annotate(f"{percent:.1f}%", xy=(x, 0), xycoords=('data', 'axes fraction'),
-                 xytext=(0, 5), textcoords='offset points', va='bottom', ha='center')
-
-plt.title('Histogram of Numerical Data with Percentage Labels')
-plt.xlabel('Value')
-plt.ylabel('Frequency')
-plt.grid(True)
-plt.show()
+for percent, x, height in zip(percentages, bin_centers, n):
+    plt.annotate(f"{percent:.1f}%", xy=(x, height), xytext=(0, 5), textcoords='offset points', va='bottom', ha='center')
