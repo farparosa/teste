@@ -1,3 +1,95 @@
-# Annotate each bar with the percentage
-for percent, x, height in zip(percentages, bin_centers, n):
-    plt.annotate(f"{percent:.1f}%", xy=(x, height), xytext=(0, 5), textcoords='offset points', va='bottom', ha='center')
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from sklearn.metrics import roc_curve, auc, RocCurveDisplay
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+X = df.drop('target', axis=1)  # Replace 'target' with your actual target column name
+y = df['target']  # Target variable
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+rf_clf = RandomForestClassifier(random_state=42)
+rf_clf.fit(X_train, y_train)
+
+y_pred = rf_clf.predict(X_test)
+
+
+
+
+
+# Classification Report
+print(classification_report(y_test, y_pred))
+
+print("Accuracy Score:", accuracy_score(y_test, y_pred))
+
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(10, 7))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()
+
+
+
+
+
+# Compute ROC curve and ROC area for each class
+fpr, tpr, _ = roc_curve(y_test, rf_clf.predict_proba(X_test)[:, 1])
+roc_auc = auc(fpr, tpr)
+
+# Plot ROC curve
+plt.figure(figsize=(8, 6))
+lw = 2
+plt.plot(fpr, tpr, color='darkorange', lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc="lower right")
+plt.show()
+
+
+
+
+# Get feature importances
+importances = rf_clf.feature_importances_
+
+# Sort the feature importances in descending order
+indices = np.argsort(importances)[::-1]
+
+# Plot the feature importances of the forest
+plt.figure(figsize=(12, 8))
+plt.title("Feature importances")
+plt.bar(range(X_train.shape[1]), importances[indices],
+        color="r", align="center")
+plt.xticks(range(X_train.shape[1]), X_train.columns[indices], rotation=90)
+plt.xlim([-1, X_train.shape[1]])
+plt.xlabel('Features')
+plt.ylabel('Importance')
+plt.show()
+
+
+
+
+
+
+from sklearn.metrics import precision_recall_curve, PrecisionRecallDisplay
+
+precision, recall, _ = precision_recall_curve(y_test, rf_clf.predict_proba(X_test)[:, 1])
+
+plt.figure(figsize=(8, 6))
+plt.step(recall, precision, where='post')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.ylim([0.0, 1.05])
+plt.xlim([0.0, 1.0])
+plt.title('Precision-Recall curve')
+plt.show()
