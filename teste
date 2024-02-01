@@ -1,95 +1,44 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-from sklearn.metrics import roc_curve, auc, RocCurveDisplay
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
-X = df.drop('target', axis=1)  # Replace 'target' with your actual target column name
-y = df['target']  # Target variable
+# Generate a synthetic dataset for illustration
+X, y = make_classification(n_samples=1000, n_features=20, n_informative=15, n_redundant=5, random_state=42)
 
+# Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Initialize the Random Forest classifier
+# n_estimators is the number of trees in the forest
+# n_jobs=-1 enables parallel computation using all available CPU cores
+# random_state is set for reproducibility of results
+rf = RandomForestClassifier(n_estimators=200, n_jobs=-1, random_state=42)
 
-rf_clf = RandomForestClassifier(random_state=42)
-rf_clf.fit(X_train, y_train)
+# Train the Random Forest model
+rf.fit(X_train, y_train)
 
-y_pred = rf_clf.predict(X_test)
+# Make predictions on the test set
+y_pred = rf.predict(X_test)
 
+# Calculate the accuracy of the model
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Model accuracy: {accuracy:.2f}')
 
+# Optional: You can use GridSearchCV or RandomizedSearchCV for hyperparameter tuning, including finding an optimal number of trees
+from sklearn.model_selection import GridSearchCV
 
+# Define the parameter grid
+param_grid = {
+    'n_estimators': [100, 200, 300, 400, 500]  # Example range, can be adjusted based on computational resources and desired granularity
+}
 
+# Initialize the Grid Search with cross-validation
+grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5, n_jobs=-1)
 
-# Classification Report
-print(classification_report(y_test, y_pred))
+# Fit the grid search to the data
+grid_search.fit(X_train, y_train)
 
-print("Accuracy Score:", accuracy_score(y_test, y_pred))
-
-cm = confusion_matrix(y_test, y_pred)
-plt.figure(figsize=(10, 7))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.title('Confusion Matrix')
-plt.show()
-
-
-
-
-
-# Compute ROC curve and ROC area for each class
-fpr, tpr, _ = roc_curve(y_test, rf_clf.predict_proba(X_test)[:, 1])
-roc_auc = auc(fpr, tpr)
-
-# Plot ROC curve
-plt.figure(figsize=(8, 6))
-lw = 2
-plt.plot(fpr, tpr, color='darkorange', lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
-plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic')
-plt.legend(loc="lower right")
-plt.show()
-
-
-
-
-# Get feature importances
-importances = rf_clf.feature_importances_
-
-# Sort the feature importances in descending order
-indices = np.argsort(importances)[::-1]
-
-# Plot the feature importances of the forest
-plt.figure(figsize=(12, 8))
-plt.title("Feature importances")
-plt.bar(range(X_train.shape[1]), importances[indices],
-        color="r", align="center")
-plt.xticks(range(X_train.shape[1]), X_train.columns[indices], rotation=90)
-plt.xlim([-1, X_train.shape[1]])
-plt.xlabel('Features')
-plt.ylabel('Importance')
-plt.show()
-
-
-
-
-
-
-from sklearn.metrics import precision_recall_curve, PrecisionRecallDisplay
-
-precision, recall, _ = precision_recall_curve(y_test, rf_clf.predict_proba(X_test)[:, 1])
-
-plt.figure(figsize=(8, 6))
-plt.step(recall, precision, where='post')
-plt.xlabel('Recall')
-plt.ylabel('Precision')
-plt.ylim([0.0, 1.05])
-plt.xlim([0.0, 1.0])
-plt.title('Precision-Recall curve')
-plt.show()
+# Print the best parameters and the best score achieved
+print(f'Best Parameters: {grid_search.best_params_}')
+print(f'Best Cross-Validation Score: {grid_search.best_score_:.2f}')
