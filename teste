@@ -1,44 +1,45 @@
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-
-# Generate a synthetic dataset for illustration
-X, y = make_classification(n_samples=1000, n_features=20, n_informative=15, n_redundant=5, random_state=42)
-
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
 # Initialize the Random Forest classifier
-# n_estimators is the number of trees in the forest
-# n_jobs=-1 enables parallel computation using all available CPU cores
-# random_state is set for reproducibility of results
-rf = RandomForestClassifier(n_estimators=200, n_jobs=-1, random_state=42)
+rf = RandomForestClassifier(n_jobs=-1, random_state=42)
 
-# Train the Random Forest model
-rf.fit(X_train, y_train)
-
-# Make predictions on the test set
-y_pred = rf.predict(X_test)
-
-# Calculate the accuracy of the model
-accuracy = accuracy_score(y_test, y_pred)
-print(f'Model accuracy: {accuracy:.2f}')
-
-# Optional: You can use GridSearchCV or RandomizedSearchCV for hyperparameter tuning, including finding an optimal number of trees
-from sklearn.model_selection import GridSearchCV
-
-# Define the parameter grid
-param_grid = {
-    'n_estimators': [100, 200, 300, 400, 500]  # Example range, can be adjusted based on computational resources and desired granularity
+# Define the parameter grid to search
+param_distributions = {
+    'n_estimators': np.arange(100, 501, 50),  # Number of trees in the forest
+    'max_depth': [None] + list(np.arange(5, 51, 5)),  # Maximum depth of the tree, including 'None' for unlimited depth
+    'min_samples_split': np.arange(2, 21, 2),  # Minimum number of samples required to split an internal node
+    'min_samples_leaf': np.arange(1, 21, 2),  # Minimum number of samples required to be at a leaf node
+    'max_features': ['auto', 'sqrt', 'log2']  # The number of features to consider when looking for the best split
 }
 
-# Initialize the Grid Search with cross-validation
-grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5, n_jobs=-1)
+# Initialize the RandomizedSearchCV object
+random_search = RandomizedSearchCV(estimator=rf, param_distributions=param_distributions, n_iter=100, cv=5, verbose=2, random_state=42, n_jobs=-1)
 
-# Fit the grid search to the data
-grid_search.fit(X_train, y_train)
+# Fit the random search model
+random_search.fit(X_train, y_train)
 
 # Print the best parameters and the best score achieved
-print(f'Best Parameters: {grid_search.best_params_}')
-print(f'Best Cross-Validation Score: {grid_search.best_score_:.2f}')
+print(f'Best Parameters: {random_search.best_params_}')
+print(f'Best Cross-Validation Score: {random_search.best_score_:.2f}')
+
+# Use the best estimator to make predictions on the test set
+best_rf = random_search.best_estimator_
+y_pred = best_rf.predict(X_test)
+
+# Calculate and print the accuracy on the test set
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Test Set Accuracy: {accuracy:.2f}')
+
+
+
+
+
+
+
+param_distributions = {
+    'n_estimators': np.arange(100, 1001, 100),  # Number of trees, exploring a wide range from 100 to 1000
+    'max_depth': [None] + list(np.arange(5, 51, 5)),  # Maximum depth, including 'None' for unlimited depth and increments of 5 up to 50
+    'min_samples_split': [2, 5, 10, 15, 20],  # Minimum number of samples required to split a node, starting from 2 (default) and including other small values
+    'min_samples_leaf': [1, 2, 4, 6, 8, 10],  # Minimum number of samples required at a leaf node, starting from 1 (default) and exploring slightly larger values
+    'max_features': ['auto', 'sqrt', 'log2', None] + list(np.linspace(0.1, 1.0, 10, endpoint=True)),  # The number of features to consider when looking for the best split, including 'auto', 'sqrt', 'log2', 'None' (all features), and a range from 10% to 100% of the features
+    'bootstrap': [True, False],  # Whether bootstrap samples are used when building trees. If False, the whole dataset is used to build each tree
+    'max_samples': [None] + list(np.linspace(0.1, 1.0, 10, endpoint=True))  # The fraction of samples to be used for fitting each individual base learner. If None (default), the whole dataset is used to build each tree
+}
