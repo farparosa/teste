@@ -1,41 +1,76 @@
-import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import GridSearchCV
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 
 
-X, y = make_classification(n_samples=1000, n_features=20, n_informative=15, n_redundant=5, random_state=42)
+## X TRAIN X TEST
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-model = LogisticRegression(max_iter=100)  # Começamos com 100 iterações
-
-model.fit(X_train, y_train)
-
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Acurácia: {accuracy:.2f}")
-print(classification_report(y_test, y_pred))
-
-## Hyperparameters Tuning
-
-param_grid = {
-    'max_iter': [100, 200, 300],  # Você pode escolher mais valores para testar
-    'C': [0.1, 1, 10]  # Varia o C para ver o efeito da regularização
+# Inicializar os modelos
+models = {
+    "Decision Tree": DecisionTreeClassifier(),
+    "Random Forest": RandomForestClassifier(),
+    "SVM": SVC(),
+    "k-NN": KNeighborsClassifier()
 }
 
-grid_search = GridSearchCV(LogisticRegression(), param_grid, cv=5, scoring='accuracy')
+# Dicionário para armazenar os resultados
+results = {}
 
-grid_search.fit(X_train, y_train)
+# Loop para treinar e avaliar cada modelo
+for name, model in models.items():
+    # Treinamento do modelo
+    model.fit(X_train, y_train)
+    
+    # Avaliação do modelo
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+    
+    # Armazenar os resultados
+    results[name] = {"Accuracy": accuracy, "Report": report}
 
-print("Melhores parâmetros:", grid_search.best_params_)
-print("Melhor acurácia:", grid_search.best_score_)
-
-results = grid_search.cv_results_
-for mean_score, params in zip(results['mean_test_score'], results['params']):
-    print(mean_score, params)
-
+# Exibir os resultados
+for name, metrics in results.items():
+    print(f"Model: {name}")
+    print(f"Accuracy: {metrics['Accuracy']:.2f}")
+    print(metrics['Report'])
 
 
+
+
+
+
+# Inicializar os modelos
+models = {
+    "Decision Tree": DecisionTreeClassifier(),
+    "Random Forest": RandomForestClassifier(),
+    "SVM": SVC(),
+    "k-NN": KNeighborsClassifier()
+}
+
+# Dicionário para armazenar os resultados
+results = {}
+
+# Loop para treinar e avaliar cada modelo
+for name, model in models.items():
+    # Treinamento do modelo
+    model.fit(X_train, y_train)
+    
+    # Avaliação do modelo
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+    
+    # Armazenar os resultados
+    results[name] = {"Accuracy": accuracy, "Report": report}
+
+# Exibir os resultados
+for name, metrics in results.items():
+    print(f"Model: {name}")
+    print(f"Accuracy: {metrics['Accuracy']:.2f}")
+    print(metrics['Report'])
