@@ -1,28 +1,41 @@
-# Initialize the Random Forest Classifier
-rf = RandomForestClassifier()
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import GridSearchCV
 
-# Define the parameter grid
+
+X, y = make_classification(n_samples=1000, n_features=20, n_informative=15, n_redundant=5, random_state=42)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LogisticRegression(max_iter=100)  # Começamos com 100 iterações
+
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Acurácia: {accuracy:.2f}")
+print(classification_report(y_test, y_pred))
+
+## Hyperparameters Tuning
+
 param_grid = {
-    'n_estimators': [10, 50, 100],
-    'max_depth': [None, 10, 20],
-    'min_samples_split': [2, 5]
+    'max_iter': [100, 200, 300],  # Você pode escolher mais valores para testar
+    'C': [0.1, 1, 10]  # Varia o C para ver o efeito da regularização
 }
 
-# Initialize GridSearchCV
-grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5, scoring='accuracy')
+grid_search = GridSearchCV(LogisticRegression(), param_grid, cv=5, scoring='accuracy')
 
-# Perform the search
-grid_search.fit(X, y)
+grid_search.fit(X_train, y_train)
 
-# Access the results
-cv_results = grid_search.cv_results_
+print("Melhores parâmetros:", grid_search.best_params_)
+print("Melhor acurácia:", grid_search.best_score_)
 
-# Convert to DataFrame for easier viewing
-results_df = pd.DataFrame(cv_results)
+results = grid_search.cv_results_
+for mean_score, params in zip(results['mean_test_score'], results['params']):
+    print(mean_score, params)
 
-# Display the relevant columns
-relevant_columns = ['params', 'mean_test_score', 'std_test_score', 'rank_test_score']
-display_df = results_df.loc[:, relevant_columns]
 
-# Sort the results by the rank of the test score
-sorted_display_df = display_df.sort_values(by='rank_test_score')
+
