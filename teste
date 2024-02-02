@@ -1,76 +1,17 @@
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
-
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-
-
-## X TRAIN X TEST
-
-# Inicializar os modelos
-models = {
-    "Decision Tree": DecisionTreeClassifier(),
-    "Random Forest": RandomForestClassifier(),
-    "SVM": SVC(),
-    "k-NN": KNeighborsClassifier()
+param_grid_rf_expanded = {
+    'n_estimators': [100, 200],  # Experimente com mais árvores
+    'max_depth': [None, 10, 20, 30],  # Adiciona mais opções de profundidade
+    'min_samples_split': [2, 5, 10],  # Varia o mínimo para dividir um nó
+    'min_samples_leaf': [1, 2, 4],  # Testa diferentes mínimos para um nó folha
+    'max_features': ['auto', 'sqrt', 'log2'],  # Varia as características consideradas para o melhor split
+    'bootstrap': [True, False],  # Considera tanto bootstrapping quanto o uso de toda a dataset
+    'criterion': ['gini', 'entropy']  # Testa diferentes critérios
 }
 
-# Dicionário para armazenar os resultados
-results = {}
 
-# Loop para treinar e avaliar cada modelo
-for name, model in models.items():
-    # Treinamento do modelo
-    model.fit(X_train, y_train)
-    
-    # Avaliação do modelo
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred)
-    
-    # Armazenar os resultados
-    results[name] = {"Accuracy": accuracy, "Report": report}
-
-# Exibir os resultados
-for name, metrics in results.items():
-    print(f"Model: {name}")
-    print(f"Accuracy: {metrics['Accuracy']:.2f}")
-    print(metrics['Report'])
+grid_search_rf_expanded = GridSearchCV(RandomForestClassifier(), param_grid_rf_expanded, cv=5, scoring='accuracy', n_jobs=-1)
+grid_search_rf_expanded.fit(X_train, y_train)
 
 
-
-
-
-
-# Inicializar os modelos
-models = {
-    "Decision Tree": DecisionTreeClassifier(),
-    "Random Forest": RandomForestClassifier(),
-    "SVM": SVC(),
-    "k-NN": KNeighborsClassifier()
-}
-
-# Dicionário para armazenar os resultados
-results = {}
-
-# Loop para treinar e avaliar cada modelo
-for name, model in models.items():
-    # Treinamento do modelo
-    model.fit(X_train, y_train)
-    
-    # Avaliação do modelo
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred)
-    
-    # Armazenar os resultados
-    results[name] = {"Accuracy": accuracy, "Report": report}
-
-# Exibir os resultados
-for name, metrics in results.items():
-    print(f"Model: {name}")
-    print(f"Accuracy: {metrics['Accuracy']:.2f}")
-    print(metrics['Report'])
+print("Random Forest (Expandido) - Melhores parâmetros:", grid_search_rf_expanded.best_params_)
+print("Random Forest (Expandido) - Melhor acurácia:", grid_search_rf_expanded.best_score_)
