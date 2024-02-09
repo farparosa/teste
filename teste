@@ -18,3 +18,17 @@ stacking_clf = StackingClassifier(estimators=[('rf', rf), ('xgb', xgboost)], fin
 
 
 stacking_clf = StackingClassifier(estimators=[('rf', rf), ('xgb', xgboost)], final_estimator=LogisticRegression(), cv=5)
+
+
+
+from sklearn.inspection import permutation_importance
+
+# Perform permutation importance
+results = permutation_importance(stacking_clf, X_test, y_test, n_repeats=10, random_state=42, scoring='accuracy')
+
+# Get the importance of each feature
+feature_importance = results.importances_mean
+
+# Print the feature importances
+for i, importance in enumerate(feature_importance):
+    print(f'Feature {i}: {importance}')
