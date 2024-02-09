@@ -1,17 +1,20 @@
-param_grid_rf_expanded = {
-    'n_estimators': [100, 200],  # Experimente com mais árvores
-    'max_depth': [None, 10, 20, 30],  # Adiciona mais opções de profundidade
-    'min_samples_split': [2, 5, 10],  # Varia o mínimo para dividir um nó
-    'min_samples_leaf': [1, 2, 4],  # Testa diferentes mínimos para um nó folha
-    'max_features': ['auto', 'sqrt', 'log2'],  # Varia as características consideradas para o melhor split
-    'bootstrap': [True, False],  # Considera tanto bootstrapping quanto o uso de toda a dataset
-    'criterion': ['gini', 'entropy']  # Testa diferentes critérios
-}
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, StackingClassifier
+from sklearn.linear_model import LogisticRegression
+import xgboost as xgb
+from sklearn.metrics import accuracy_score
+
+X, y = make_classification(n_samples=1000, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 
-grid_search_rf_expanded = GridSearchCV(RandomForestClassifier(), param_grid_rf_expanded, cv=5, scoring='accuracy', n_jobs=-1)
-grid_search_rf_expanded.fit(X_train, y_train)
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+xgboost = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
 
 
-print("Random Forest (Expandido) - Melhores parâmetros:", grid_search_rf_expanded.best_params_)
-print("Random Forest (Expandido) - Melhor acurácia:", grid_search_rf_expanded.best_score_)
+stacking_clf = StackingClassifier(estimators=[('rf', rf), ('xgb', xgboost)], final_estimator=LogisticRegression(), cv=5)
+
+
+stacking_clf = StackingClassifier(estimators=[('rf', rf), ('xgb', xgboost)], final_estimator=LogisticRegression(), cv=5)
