@@ -21,6 +21,8 @@ stacking_clf = StackingClassifier(estimators=[('rf', rf), ('xgb', xgboost)], fin
 
 
 
+
+
 from sklearn.inspection import permutation_importance
 
 # Perform permutation importance
@@ -32,3 +34,27 @@ feature_importance = results.importances_mean
 # Print the feature importances
 for i, importance in enumerate(feature_importance):
     print(f'Feature {i}: {importance}')
+
+
+
+
+
+
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, StackingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+import xgboost as xgb
+
+# Define base learners
+base_learners = [
+    ('rf', RandomForestClassifier(n_estimators=100, random_state=42)),
+    ('gb', GradientBoostingClassifier(n_estimators=100, random_state=42)),
+    ('xgb', xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')),
+    ('svc', SVC(probability=True, kernel='linear', random_state=42))
+]
+
+# Define the meta-learner
+final_estimator = LogisticRegression()
+
+# Define the stacking classifier
+stacking_clf = StackingClassifier(estimators=base_learners, final_estimator=final_estimator, cv=5)
