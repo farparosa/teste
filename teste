@@ -1,60 +1,70 @@
-import numpy as np
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier, StackingClassifier
-from sklearn.linear_model import LogisticRegression
-import xgboost as xgb
-from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler, RobustScaler
+import joblib  # or import pickle
 
-X, y = make_classification(n_samples=1000, n_features=20, n_informative=2, n_redundant=10, n_classes=2, random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+# Assuming X_train is your training data
 
+# MinMaxScaler
+min_max_scaler = MinMaxScaler()
+min_max_scaler.fit(X_train)
+joblib.dump(min_max_scaler, 'min_max_scaler.save')  # or use pickle
 
-rf = RandomForestClassifier(n_estimators=100, random_state=42)
-xgboost = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
-
-
-stacking_clf = StackingClassifier(estimators=[('rf', rf), ('xgb', xgboost)], final_estimator=LogisticRegression(), cv=5)
-
-
-stacking_clf = StackingClassifier(estimators=[('rf', rf), ('xgb', xgboost)], final_estimator=LogisticRegression(), cv=5)
-
-
-
-
-
-from sklearn.inspection import permutation_importance
-
-# Perform permutation importance
-results = permutation_importance(stacking_clf, X_test, y_test, n_repeats=10, random_state=42, scoring='accuracy')
-
-# Get the importance of each feature
-feature_importance = results.importances_mean
-
-# Print the feature importances
-for i, importance in enumerate(feature_importance):
-    print(f'Feature {i}: {importance}')
+# RobustScaler
+robust_scaler = RobustScaler()
+robust_scaler.fit(X_train)
+joblib.dump(robust_scaler, 'robust_scaler.save')  # or use pickle
 
 
 
 
 
 
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, StackingClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-import xgboost as xgb
+from sklearn.preprocessing import OneHotEncoder
 
-# Define base learners
-base_learners = [
-    ('rf', RandomForestClassifier(n_estimators=100, random_state=42)),
-    ('gb', GradientBoostingClassifier(n_estimators=100, random_state=42)),
-    ('xgb', xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')),
-    ('svc', SVC(probability=True, kernel='linear', random_state=42))
-]
+# Assuming categorical_features is your categorical data
 
-# Define the meta-learner
-final_estimator = LogisticRegression()
+one_hot_encoder = OneHotEncoder(sparse=False)  # sparse=False is optional based on your preference
+one_hot_encoder.fit(categorical_features)
+joblib.dump(one_hot_encoder, 'one_hot_encoder.save')  # or use pickle
 
-# Define the stacking classifier
-stacking_clf = StackingClassifier(estimators=base_learners, final_estimator=final_estimator, cv=5)
+
+
+
+
+# Assuming 'category_column' is the column you want to frequency encode
+
+frequency_encoding = X_train['category_column'].value_counts().to_dict()
+
+# Save the frequency encoding dictionary
+import json
+with open('frequency_encoding.json', 'w') as f:
+    json.dump(frequency_encoding, f)
+
+
+
+
+
+# Load the saved encoders
+
+# MinMaxScaler
+min_max_scaler = joblib.load('min_max_scaler.save')  # or use pickle
+
+# RobustScaler
+robust_scaler = joblib.load('robust_scaler.save')  # or use pickle
+
+# OneHotEncoder
+one_hot_encoder = joblib.load('one_hot_encoder.save')  # or use pickle
+
+# Frequency Encoding
+with open('frequency_encoding.json', 'r') as f:
+    frequency_encoding = json.load(f)
+
+# Apply the loaded encoders to new data
+# For MinMaxScaler and RobustScaler
+scaled_data = min_max_scaler.transform(new_numerical_data)  # Replace with your new data
+robust_scaled_data = robust_scaler.transform(new_numerical_data)
+
+# For OneHotEncoder
+one_hot_encoded_data = one_hot_encoder.transform(new_categorical_data)
+
+# For Frequency Encoding
+new_data['category_column'] = new_data['category_column'].map(frequency_encoding)
